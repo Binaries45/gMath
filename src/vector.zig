@@ -4,6 +4,8 @@ const helpers = @import("helpers.zig");
 
 /// construct an `N` dimensional vector with elements of type `T`
 pub fn Vec(N: comptime_int, T: type) type {
+    // maybe limit N <= 4
+
     if (!helpers.isScalar(T)) 
         @compileError(@typeName(T) ++ " is not a valid scalar type");
 
@@ -11,11 +13,6 @@ pub fn Vec(N: comptime_int, T: type) type {
         v: @Vector(N, T),
         const V = @This();
 
-        // TODO : vector functions
-        // - dot splat cross ...
-        // - swizzle
-        // - idk
-        
         /// add two vectors
         pub fn add(a: V, b: V) V {
             return .{ .v = a.v + b.v };
@@ -49,6 +46,25 @@ pub fn Vec(N: comptime_int, T: type) type {
         pub fn len(v: V) T {
             return std.math.sqrt(v.dot(v));
         }
+
+        pub fn swizzle(v: V, comptime mask: []const u8) Vec(mask.len, T) {
+            const m = comptime blk: {
+                var m: [mask.len]i32 = undefined;
+                for (mask, 0..) |c, i| {
+                    const lane: i32 = switch (c) {
+                        'x', 'r' => 0,
+                        'y', 'g' => 1,
+                        'z', 'b' => 2,
+                        'w', 'a' => 3,
+                        else => @compileError("invalid swizzle char " ++ c),
+                    };
+                    if (lane >= N) @compileError("swizzle out of range");
+                    m[i] = lane;
+                } 
+                break :blk m;
+            };
+            return .{ .v = @shuffle(T, v.v, undefined, m) };
+        }
     };
 }
 
@@ -79,5 +95,16 @@ test "dot product" {
 }
 
 test "length" {
-    // TODO 
+   const x: Vec(2, f32) = .{ .v = .{1, 0} }; 
+   const a: Vec(3, f32) = .splat(3); 
+
+   try std.testing.expect(x.len() == 1);
+   try std.testing.expect(a.len() == std.math.sqrt(@as(f32, 27)));
+}
+
+test "swizzle" {
+    const a: Vec(4, f32) = .{ .v = .{1, 2, 3, 4} };
+    const s = a.swizzle("wzyx");
+
+    try std.testing.expect(std.meta.eql(s, .{ .v = .{4, 3, 2, 1} }));
 }
