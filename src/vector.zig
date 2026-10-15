@@ -33,6 +33,26 @@ pub fn Vec(N: comptime_int, T: type) type {
             return .{ .v = a.v / b.v };
         }
 
+        /// add some scalar to each element in the vector
+        pub fn add_scalar(v: V, s: T) V {
+            return .{ .v = v.v + V.splat(s) };
+        }
+        
+        /// subtract some scalar from each element in the vector
+        pub fn sub_scalar(v: V, s: T) V {
+            return .{ .v = v.v - V.splat(s) };
+        }
+        
+        /// multiply some scalar by each element in the vector
+        pub fn mul_scalar(v: V, s: T) V {
+            return .{ .v = v.v * V.splat(s) };
+        }
+        
+        /// divide each element in the vector by some scalar
+        pub fn div_scalar(v: V, s: T) V {
+            return .{ .v = v.v / V.splat(s) };
+        }
+
         /// return the dot product of two vectors
         pub fn dot(a: V, b: V) T {
             return @reduce(.Add, a.v * b.v);
