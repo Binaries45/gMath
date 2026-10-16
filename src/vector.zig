@@ -4,7 +4,7 @@ const helpers = @import("helpers.zig");
 
 /// construct an `N` dimensional vector with elements of type `T`
 pub fn Vec(N: comptime_int, T: type) type {
-    if (N >= 4) 
+    if (N > 4) 
         @compileError("vectors can have no more than 4 components");
     
     if (!helpers.isScalar(T)) 
