@@ -35,22 +35,22 @@ pub fn Vec(N: comptime_int, T: type) type {
         }
 
         /// add some scalar to each element in the vector
-        pub fn add_scalar(v: V, s: T) V {
+        pub fn addScalar(v: V, s: T) V {
             return .{ .v = v.v + V.splat(s) };
         }
         
         /// subtract some scalar from each element in the vector
-        pub fn sub_scalar(v: V, s: T) V {
+        pub fn subScalar(v: V, s: T) V {
             return .{ .v = v.v - V.splat(s) };
         }
         
         /// multiply some scalar by each element in the vector
-        pub fn mul_scalar(v: V, s: T) V {
+        pub fn mulScalar(v: V, s: T) V {
             return .{ .v = v.v * V.splat(s) };
         }
         
         /// divide each element in the vector by some scalar
-        pub fn div_scalar(v: V, s: T) V {
+        pub fn divScalar(v: V, s: T) V {
             return .{ .v = v.v / V.splat(s) };
         }
 
@@ -105,6 +105,8 @@ test "basic math" {
     const f = e.div(.splat(3));
     try std.testing.expect(std.meta.eql(f, Vec(3, u32).splat(2)));
 }
+
+// TODO : test scalar ops
 
 test "dot product" {
     const x: Vec(3, i32) = .{ .v = .{1, 0, 0} };
