@@ -3,7 +3,7 @@ const std = @import("std");
 const Vec = @import("vector.zig").Vec;
 
 /// reutrns a column major matrix with R rows and C columns, and elements of type T
-pub fn Matrix(R: comptime_int, C: comptime_int, T: type) type {
+pub fn Mat(R: comptime_int, C: comptime_int, T: type) type {
     if (C > 4) 
         @compileError("Matrices can have at most 4 columns");
 
@@ -32,9 +32,9 @@ pub fn Matrix(R: comptime_int, C: comptime_int, T: type) type {
         // }
 
         /// transpose the given matrix
-        pub fn transpose(m: M) Matrix(C, R, T) {
+        pub fn transpose(m: M) Mat(C, R, T) {
             // if (C == 4 and R == 4) return transpose4(m);
-            const RM = Matrix(C, R, T);
+            const RM = Mat(C, R, T);
             var res: RM = undefined;  
 
             // TODO : special transpose functions for square matrices?
@@ -58,9 +58,9 @@ pub fn Matrix(R: comptime_int, C: comptime_int, T: type) type {
 }
 
 /// construct a perpective projection matrix from the given params
-pub fn persp(fov: f32, aspect: f32, near: f32, far: f32) Matrix(4, 4, f32) {
-    const Mat = Matrix(4, 4, f32);
-    var res: Mat = .indentity();
+pub fn persp(fov: f32, aspect: f32, near: f32, far: f32) Mat(4, 4, f32) {
+    const M = Mat(4, 4, f32);
+    var res: M = .indentity();
 
     const t = std.math.tan(fov * (std.math.pi / 360));
 
@@ -75,14 +75,14 @@ pub fn persp(fov: f32, aspect: f32, near: f32, far: f32) Matrix(4, 4, f32) {
 }
 
 test "transpose" {
-    const m: Matrix(3, 3, i32) = .{ .m = .{
+    const m: Mat(3, 3, i32) = .{ .m = .{
         .{ .v = .{1, 2, 3} },
         .{ .v = .{1, 2, 3} },
         .{ .v = .{1, 2, 3} },
     }};
 
     const tm = m.transpose();
-    const expected: Matrix(3, 3, i32) = .{ .m = .{ 
+    const expected: Mat(3, 3, i32) = .{ .m = .{ 
         .{ .v = .{1, 1, 1} },
         .{ .v = .{2, 2, 2} },
         .{ .v = .{3, 3, 3} },
