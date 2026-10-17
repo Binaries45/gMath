@@ -26,8 +26,14 @@ pub fn Matrix(R: comptime_int, C: comptime_int, T: type) type {
             return res;
         }
 
+        /// special 4x4 matrix transpose.
+        // fn transpose4(m: Matrix(4, 4, T)) Matrix(4, 4, T) {
+            // TODO : this
+        // }
+
         /// transpose the given matrix
         pub fn transpose(m: M) Matrix(C, R, T) {
+            // if (C == 4 and R == 4) return transpose4(m);
             const RM = Matrix(C, R, T);
             var res: RM = undefined;  
 
@@ -46,10 +52,26 @@ pub fn Matrix(R: comptime_int, C: comptime_int, T: type) type {
         // - mul (mat x vec, vec x mat, mat x mat)
         //   - generic mul handling all of the above
         // - look at
-        // - perspective
         // - rotate
         // - other transformations too
     };
+}
+
+/// construct a perpective projection matrix from the given params
+pub fn persp(fov: f32, aspect: f32, near: f32, far: f32) Matrix(4, 4, f32) {
+    const Mat = Matrix(4, 4, f32);
+    var res: Mat = .indentity();
+
+    const t = std.math.tan(fov * (std.math.pi / 360));
+
+    res.m[0].v[0] = 1 / t;
+    res.m[1].v[1] = aspect / t;
+    res.m[2].v[3] = -1;
+    res.m[2].v[2] = (near + far) / (near - far);
+    res.m[3].v[2] = (2 * near * far) / (near - far);
+    res.m[3].v[3] = 0;
+
+    return res;
 }
 
 test "transpose" {
