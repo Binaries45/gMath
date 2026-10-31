@@ -7,7 +7,7 @@ pub fn Mat(R: comptime_int, C: comptime_int, T: type) type {
     if (C > 4) 
         @compileError("Matrices can have at most 4 columns");
 
-    return extern struct {
+    return struct {
         m: [C]Vec(R, T),
 
         /// the type of each column vector
