@@ -14,6 +14,16 @@ pub fn Vec(N: comptime_int, T: type) type {
         v: @Vector(N, T),
         const V = @This();
 
+        /// construct an array from a vector
+        pub fn toArray(v: V) [N]T {
+            return v.v;
+        }
+
+        /// construct a vector from an array
+        pub fn fromArray(a: [N]T) V {
+            return .{ .v = a };
+        }
+
         /// add two vectors
         pub fn add(a: V, b: V) V {
             return .{ .v = a.v + b.v };
