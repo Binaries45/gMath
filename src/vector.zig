@@ -14,6 +14,8 @@ pub fn Vec(N: comptime_int, T: type) type {
         v: @Vector(N, T),
         const V = @This();
 
+        const zero: V = .splat(0);
+
         /// construct an array from a vector
         pub fn toArray(v: V) [N]T {
             return v.v;
@@ -76,6 +78,25 @@ pub fn Vec(N: comptime_int, T: type) type {
         /// return the magnitude of the vector
         pub fn len(v: V) T {
             return std.math.sqrt(v.dot(v));
+        }
+
+        /// vector cross product
+        pub fn cross(a: V, b: V) V {
+            return .{ .v = .{
+                a[1] * b[2] - a[2] * b[1],
+                a[2] * b[0] - a[0] * b[2],
+                a[1] * b[0] - a[0] * b[1],
+            }};
+        }
+
+        /// normalize a vector
+        pub fn normalize(v: V) V {
+            const l = v.len();
+            if (l == 0.0) {
+                return v.divScalar(l);
+            } else {
+                return .zero;
+            }
         }
 
         pub fn swizzle(v: V, comptime mask: []const u8) Vec(mask.len, T) {

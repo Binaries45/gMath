@@ -1,6 +1,12 @@
 
 const std = @import("std");
+const math = std.math;
+const helpers = @import("helpers.zig");
+const radians = helpers.radians;
+
 const Vec = @import("vector.zig").Vec;
+const Vec3 = Vec(3, f32);
+const Mat4 = Mat(4, 4, f32);
 
 /// reutrns a column major matrix with R rows and C columns, and elements of type T
 pub fn Mat(R: comptime_int, C: comptime_int, T: type) type {
@@ -51,15 +57,73 @@ pub fn Mat(R: comptime_int, C: comptime_int, T: type) type {
         // - scalar ops
         // - mul (mat x vec, vec x mat, mat x mat)
         //   - generic mul handling all of the above
-        // - look at
-        // - rotate
-        // - other transformations too
     };
 }
 
+// TODO : other transformation matrices
+
+/// create a translation matrix from the given vector
+pub fn translate(t: Vec3) Mat4 {
+    var res: Mat4 = .indentity();
+    res.m[3].v[0] = t.v[0];
+    res.m[3].v[1] = t.v[1];
+    res.m[3].v[2] = t.v[2];
+    return res;
+}
+
+///
+pub fn rotate(angle: f32, axis_unorm: Vec3) Mat4 {
+    var res: Mat4 = .indentity();
+    
+    const axis = axis_unorm.normalize();
+    const sin_theta = math.sin(radians(angle));
+    const cos_theta = math.cos(radians(angle));
+    const cos_value = 1.0 - cos_theta;
+
+    res.m[0].v[0] = (axis.v[0] * axis.v[0] * cos_value) + cos_theta;
+    res.m[0].v[1] = (axis.v[0] * axis.v[1] * cos_value) + (axis.v[2] * sin_theta);
+    res.m[0].v[2] = (axis.v[0] * axis.v[2] * cos_value) - (axis.v[1] * sin_theta);
+    res.m[1].v[0] = (axis.v[1] * axis.v[0] * cos_value) - (axis.v[2] * sin_theta);
+    res.m[1].v[1] = (axis.v[1] * axis.v[1] * cos_value) + cos_theta;
+    res.m[1].v[2] = (axis.v[1] * axis.v[2] * cos_value) + (axis.v[0] * sin_theta);
+    res.m[2].v[0] = (axis.v[2] * axis.v[0] * cos_value) + (axis.v[1] * sin_theta);
+    res.m[2].v[1] = (axis.v[2] * axis.v[1] * cos_value) - (axis.v[2] * sin_theta);
+    res.m[2].v[2] = (axis.v[2] * axis.v[2] * cos_value) + cos_theta;
+
+    return res;
+}
+
+/// 
+pub fn lookat(eye: Vec3, center: Vec3, up: Vec3) Mat4 {
+    var res: Mat4 = .zero();
+    
+    const f = center.sub(eye).normalize();
+    const s = f.cross(up).normalize();
+    const u = s.cross(f);
+
+    res.m[0].v[0] =  s.v[0];
+    res.m[0].v[1] =  u.v[0];
+    res.m[0].v[2] = -f.v[0];
+
+    res.m[1].v[0] =  s.v[1];
+    res.m[1].v[1] =  u.v[1];
+    res.m[1].v[2] = -f.v[1];
+
+    res.m[2].v[0] =  s.v[2];
+    res.m[2].v[1] =  u.v[2];
+    res.m[2].v[2] = -f.v[2];
+
+    res.m[3].v[0] = -s.dot(eye);
+    res.m[3].v[1] = -u.dot(eye);
+    res.m[3].v[2] =  f.dot(eye);
+    res.m[3].v[3] =  1.0;
+
+    return res;
+}
+
 /// construct a perpective projection matrix from the given params
-pub fn persp(fov: f32, aspect: f32, near: f32, far: f32) Mat(4, 4, f32) {
-    const M = Mat(4, 4, f32);
+pub fn persp(fov: f32, aspect: f32, near: f32, far: f32) Mat4 {
+    const M = Mat4;
     var res: M = .indentity();
 
     const t = std.math.tan(fov * (std.math.pi / 360));

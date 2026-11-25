@@ -27,7 +27,26 @@ pub fn Quat(T: type) type {
         //        inverse, dot, length, length^2
         //        length reciprocal,
         //        is finite, is nan, is normalized
-        //        ...OTHERS 
+        //        ...OTHERS
+
+        pub fn fromXYZW(x: T, y: T, z: T, w: T) Q {
+            return .{ .v = .{x, y, z, w} };
+        }
+
+        pub fn fromArray(a: [4]T) Q {
+            return .{ .v = .{a[0], a[1], a[2], a[3]} };
+        }
+
+        pub fn fromVec4(v: V) Q {
+            return .{ .v = v.v };
+        }
+
+        pub fn fromVec3(v: Vec(3, T)) Q {
+            // TODO : add vector promotion first 
+            // (with 1 and 0 for fill)
+            _ = v;
+            return .nan;   
+        }
     };
 }
 
